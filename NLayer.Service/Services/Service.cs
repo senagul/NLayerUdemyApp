@@ -42,7 +42,7 @@ namespace NLayer.Service.Services
 
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _repository.GetAll().ToListAsync();
         }

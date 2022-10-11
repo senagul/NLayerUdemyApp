@@ -57,5 +57,51 @@ namespace NLayer.Web.Controllers
 
             return View();
         }
+
+
+        [ServiceFilter(typeof(NotFoundFilter<Product>))]
+        public async Task<IActionResult> Update(int id)
+        {
+            var product = await _services.GetByIdAsync(id);
+
+            var categories = await _categoryServices.GetAllAsync();
+
+            var categoriesDto = _mapper.Map<List<CategoryDto>>(categories.ToList());
+
+            ViewBag.categories = new SelectList(categoriesDto, "Id", "Name",product.CategoryId);
+
+            return View(_mapper.Map<ProductDto>(product));
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(ProductDto productDto)
+        {
+
+            if (ModelState.IsValid)
+            {
+                await _services.UpdateAsync(_mapper.Map<Product>(productDto));
+                return RedirectToAction(nameof(Index));
+
+            }
+
+
+            var categories = await _categoryServices.GetAllAsync();
+
+            var categoriesDto = _mapper.Map<List<CategoryDto>>(categories.ToList());
+
+            ViewBag.categories = new SelectList(categoriesDto, "Id", "Name", productDto.CategoryId);
+
+            return View(productDto);
+        }
+
+        public async Task<IActionResult> Remove(int id)
+        {
+            var product = await _services.GetByIdAsync(id);
+
+            await _services.RemoveAsync(product);
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
